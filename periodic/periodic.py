@@ -12,7 +12,7 @@ logger = logging.getLogger('periodic')
 
 class Periodic:
     def __init__(self, interval: float, coro: Callable[..., Awaitable], *args, **kwargs):
-        """Creates new periodic.
+        '''Creates new periodic.
 
         Stores coro internally and runs it every `interval` seconds.
         `args` and `kwargs` will be transferred to present coro when it's called.
@@ -24,7 +24,7 @@ class Periodic:
         :param coro: Any callable object that returns awaitable(e.g. coroutine function).
         :param args: Positional arguments for present coro.
         :param kwargs: Keywords arguments for present coro.
-        """
+        '''
 
         self.__coro = coro
         self.__args = args
@@ -39,59 +39,59 @@ class Periodic:
 
     @property
     def interval(self):
-        """
+        '''
 
         :return: Using interval.
-        """
+        '''
         return self.__interval
 
     @property
     def started(self):
-        """ Current periodic state.
+        ''' Current periodic state.
 
         :return: True if periodic is started.
-        """
+        '''
 
         return self.__started
 
     @property
     def running(self):
-        """ Current task state.
+        ''' Current task state.
 
         :return: True if task is running.
-        """
+        '''
 
         return self.__running
 
     @property
     def coro(self):
-        """
+        '''
 
         :return: Using coro.
-        """
+        '''
 
         return self.__coro
 
     @property
     def args(self):
-        """
+        '''
 
         :return: Using args.
-        """
+        '''
 
         return self.__args
 
     @property
     def kwargs(self):
-        """
+        '''
 
         :return: Using kwargs.
-        """
+        '''
 
         return self.__kwargs
 
     async def start(self, delay: float = None):
-        """Starts periodic.
+        '''Starts periodic.
 
         If `delay` is None(default) task will be called first time after selected
         interval, if 0, task will be called immediately, otherwise task will be
@@ -99,7 +99,7 @@ class Periodic:
 
         :param delay: Delay for the first run of task in seconds. Default is None.
         :return: None
-        """
+        '''
 
         if self.__started:
             return
@@ -118,7 +118,7 @@ class Periodic:
             self.__handler = self.__loop.call_later(delay, self.__run)
 
     async def stop(self, wait: float = 0):
-        """Stops periodic. Wait or cancel task if it running.
+        '''Stops periodic. Wait or cancel task if it running.
 
         If `wait` is 0(by default) task will be cancelled immediately. If False
         then stop will wait until task finished, otherwise stop will wait for
@@ -126,7 +126,7 @@ class Periodic:
 
         :param wait: Seconds for waiting task for stop.
         :return: None
-        """
+        '''
 
         if not self.__started:
             return
@@ -168,7 +168,10 @@ class Periodic:
         self.__handler = self.__loop.call_later(self.__interval, self.__run)
 
         if self.__running:
-            logger.error('Throttling periodic call')
+            arg_list = [repr(arg) for arg in self.__args] + [f'{key}={repr(val)}' for key, val in self.__kwargs.items()]
+            arg_list = ', '.join(arg_list)
+            func_info = f'{self.__coro.__name__}({arg_list})'
+            logger.error(f'Throttling periodic call of {func_info}')
             return
 
         self.__running = True
