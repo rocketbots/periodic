@@ -171,7 +171,10 @@ class Periodic:
         self.__handler = self.__loop.call_later(self.__interval, self.__run)
 
         if self.__running:
-            logger.error('Throttling periodic call')
+            arg_list = [repr(arg) for arg in self.__args] + [f'{key}={repr(val)}' for key, val in self.__kwargs.items()]
+            arg_list = ', '.join(arg_list)
+            func_info = f'{self.__coro.__qualname__}({arg_list})'
+            logger.error(f'Throttling periodic call of {func_info}')
             return
 
         self.__running = True
