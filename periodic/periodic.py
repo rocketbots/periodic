@@ -4,8 +4,11 @@
 
 import asyncio
 import logging
+import sys
 from contextlib import suppress
 from typing import Callable, Awaitable
+
+assert sys.hexversion >= 0x03070000, "Periodic package requires on Python 3.7 or above"
 
 logger = logging.getLogger('periodic')
 
